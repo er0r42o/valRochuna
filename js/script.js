@@ -156,6 +156,8 @@ document.addEventListener('click', (e) => {
 // Yes character click
 yesChar.addEventListener('click', () => {
   document.querySelector('.proposal-text').textContent = `Yes! 💖`;
+  launchConfetti();
+  runConfetti();
   stopConfettiAfter(8000);
   playTwinkle();
   yesChar.classList.add('shield','save');
