@@ -209,11 +209,14 @@ modalContent.addEventListener('mousemove', (e) => {
 });
 
 function spawnEvadeNo(angle){
-  const bounds = modalContent.getBoundingClientRect();
-  const padding = 18; const radius = Math.min(bounds.width,bounds.height) * 0.45 + 60;
-  const cx = bounds.left + bounds.width/2; const cy = bounds.top + bounds.height/2;
-  const tx = Math.max(padding, Math.min(bounds.width - 100, (cx + Math.cos(angle) * radius) - bounds.left));
-  const ty = Math.max(padding, Math.min(bounds.height - 68, (cy + Math.sin(angle) * radius) - bounds.top));
+  const danceActions = modal.querySelector('.dance-actions');
+  const bounds = danceActions.getBoundingClientRect();
+  const padding = 20;
+  const radius = Math.min(bounds.width, bounds.height) * 0.35;
+  const cx = bounds.width / 2;
+  const cy = bounds.height / 2;
+  const tx = Math.max(padding, Math.min(bounds.width - 130, cx + Math.cos(angle) * radius - 55));
+  const ty = Math.max(padding, Math.min(bounds.height - 100, cy + Math.sin(angle) * radius - 45));
   animateCharTo(noChar, Math.round(tx), Math.round(ty));
 }
 
