@@ -109,39 +109,12 @@ const closeBtn = document.getElementById('close-modal');
 const yesChar = document.getElementById('say-yes');
 const noChar = document.getElementById('say-no');
 
-// Dancing characters
-function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
-function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
 
 
-// Dancing characters
-function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
-function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
 
-// Open modal: reset positions, start dancing
-openBtn.addEventListener('click', () => {
-  modal.setAttribute('aria-hidden', 'false');
-  playChime();
-  launchConfetti();
-  // Place characters absolutely inside the modal so they can animate and evade
-  const bounds = modalContent.getBoundingClientRect();
-  // coordinates relative to modalContent
-  const centerX = Math.round(bounds.width/2 - 55);
-  const bottomY = Math.round(bounds.height - 88);
-  // set absolute positions
-  animateCharTo(yesChar, centerX - 80, bottomY);
-  animateCharTo(noChar, centerX + 20, bottomY);
-  // start dancing animation
-  startDancing();
-});
 
-closeBtn.addEventListener('click', () => { 
-  modal.setAttribute('aria-hidden', 'true');
-  stopDancing();
-});
 
 // Yes character click
-});
 
 // Yes character click
 yesChar.addEventListener('click', () => {
@@ -163,13 +136,10 @@ noChar.addEventListener('click', (e) => {
 });
 
 // Monitor pointer near No character
-// Dancing characters: yesChar and noChar (yes shields, no evades unselectable)
-const yesChar = document.getElementById('say-yes');
-const noChar = document.getElementById('say-no');
 // cooldown to avoid repeated evasion spam
 let lastEvadeTime = 0;
 const EVADE_COOLDOWN = 700; // ms
-// initial dance
+// initial dance helpers
 function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
 function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
 
@@ -186,6 +156,10 @@ openBtn.addEventListener('click', () => {
   startDancing();
 });
 
+// Keyboard accessibility for characters
+yesChar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); yesChar.click(); }});
+noChar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); noChar.click(); }});
+
 // yes behavior (selecting Yes)
 yesChar.addEventListener('click', () => {
   document.querySelector('.proposal-text').textContent = `Yes! 💖`;
@@ -199,10 +173,6 @@ yesChar.addEventListener('click', () => {
 });
 
 // No character click (evasive)
-noChar.addEventListener('click', (e) => {
-  e.preventDefault(); e.stopPropagation();
-  playBlip();
-// No is intentionally unselectable; clicks cause it to dodge further
 noChar.addEventListener('click', (e) => {
   e.preventDefault(); e.stopPropagation();
   playBlip();
@@ -249,28 +219,13 @@ function spawnEvadeNo(angle){
 }
 
 function animateCharTo(el, left, top){
-  el.style.position = 'absolute';
-  el.style.left = left + 'px';
-  el.style.top = top + 'px';
-  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
-}
-}
-
-function animateCharTo(el, left, top){
-  el.style.position = 'absolute';
-  el.style.left = left + 'px';
-  el.style.top = top + 'px';
-  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
-}
-}
-
-function animateCharTo(el, left, top){
   // left/top are modal-content-relative coordinates
   el.style.position = 'absolute';
   el.style.left = left + 'px';
   el.style.top = top + 'px';
   el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
 }
+
 
 // When modal closes, stop dancing and reset positions
 closeBtn.addEventListener('click', ()=>{ stopDancing(); yesChar.style.left=''; yesChar.style.top=''; noChar.style.left=''; noChar.style.top=''; });
