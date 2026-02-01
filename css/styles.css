@@ -108,15 +108,43 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 }
 
 @media (max-width:640px){
-  body{padding:1.5rem}
-  .hero{padding:2rem}
-  .title{font-size:2.25rem}
-  .cards{flex-direction:column;align-items:center}
-  .card{width:86%;max-width:320px;height:150px}
+  body{padding:1rem}
+  .page{max-width:100%}
+  .hero{padding:1.5rem;border-radius:12px}
+  .hero-photo{width:80px;height:80px;right:16px;top:16px}
+  .title{font-size:2rem;margin-bottom:0.5rem}
+  .subtitle{font-size:0.9rem;margin-bottom:1rem}
+  .propose-btn{padding:0.65rem 1rem;font-size:0.9rem}
+  .cards{flex-direction:column;align-items:center;gap:0.75rem;margin-top:1.5rem}
+  .card{width:90%;max-width:280px;height:130px}
   .card:not(.flipped):not(:hover){animation:breatheCard 5.5s ease-in-out infinite}
-  .character{width:86px;height:56px}
-  .char-img{width:36px;height:36px}
-  .modal-content{padding:1.25rem;max-width:92%;width:92%}
-  .modal-actions{min-height:180px}
-  .dance-actions{min-height:180px;gap:1rem}
+  .card-front,.card-back{padding:0.9rem;font-size:0.95rem}
+  .character{width:80px;height:80px;border-radius:10px}
+  .char-img{width:44px;height:44px}
+  .character .label{font-size:0.75rem;margin-top:4px}
+  .modal{background:rgba(0,0,0,0.5)}
+  .modal-content{padding:1.5rem 1rem;max-width:95%;width:95%;border-radius:14px}
+  .modal-content h2{font-size:1.8rem;margin-bottom:0.75rem}
+  .proposal-text{font-size:1.1rem;padding:1rem 1.25rem;margin:0.75rem 0 1.5rem}
+  .modal-actions{min-height:200px;padding:1rem}
+  .dance-actions{min-height:200px;gap:1.5rem;padding:1rem}
+  .meme-overlay img{max-width:90vw;max-height:60vh}
+  .meme-overlay .meme-card{padding:0.75rem}
+  .footer{margin-top:1rem;font-size:0.85rem}
+}
+
+@media (max-width:400px){
+  body{padding:0.75rem}
+  .hero{padding:1.25rem}
+  .title{font-size:1.75rem}
+  .subtitle{font-size:0.85rem}
+  .propose-btn{padding:0.6rem 0.9rem;font-size:0.85rem}
+  .cards{margin-top:1rem}
+  .card{width:95%;height:120px}
+  .character{width:75px;height:75px}
+  .char-img{width:40px;height:40px}
+  .modal-content{padding:1.25rem 0.9rem}
+  .modal-content h2{font-size:1.5rem}
+  .proposal-text{font-size:1rem;padding:0.9rem 1rem}
+  .dance-actions{gap:1rem;min-height:180px}
 }
