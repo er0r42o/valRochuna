@@ -37,12 +37,7 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .proposal-text{color:#6b3b6b;margin:1rem 0 2.5rem 0;font-size:1.3rem;line-height:1.7;font-weight:600;background:linear-gradient(90deg,rgba(255,127,191,0.1),rgba(166,123,255,0.1));padding:1.5rem 2rem;border-radius:14px;border-left:5px solid var(--accent)}
 .modal-actions{display:flex;gap:1.2rem;justify-content:center;margin-top:1.5rem;position:relative;min-height:200px;align-items:center}
 
-/* Ensure characters remain visible when modal is open (override inline absolute placement) */
-.modal[aria-hidden="false"] .character{
-  position:relative !important;
-  left:auto !important;
-  top:auto !important;
-}
+/* Characters will be positioned absolutely inside modal when opened to allow evasion animations */
 
 /* subtle breathing for cards */
 @keyframes breatheCard{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}

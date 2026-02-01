@@ -123,13 +123,15 @@ openBtn.addEventListener('click', () => {
   modal.setAttribute('aria-hidden', 'false');
   playChime();
   launchConfetti();
-  // Reset to flex layout (characters visible at default positions)
-  yesChar.style.position = 'relative';
-  noChar.style.position = 'relative';
-  yesChar.style.left = 'auto';
-  yesChar.style.top = 'auto';
-  noChar.style.left = 'auto';
-  noChar.style.top = 'auto';
+  // Place characters absolutely inside the modal so they can animate and evade
+  const bounds = modalContent.getBoundingClientRect();
+  // coordinates relative to modalContent
+  const centerX = Math.round(bounds.width/2 - 55);
+  const bottomY = Math.round(bounds.height - 88);
+  // set absolute positions
+  animateCharTo(yesChar, centerX - 80, bottomY);
+  animateCharTo(noChar, centerX + 20, bottomY);
+  // start dancing animation
   startDancing();
 });
 
