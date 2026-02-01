@@ -100,7 +100,7 @@ function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remo
 
 // cooldown to avoid repeated evasion spam
 let lastEvadeTime = 0;
-const EVADE_COOLDOWN = 700;
+const EVADE_COOLDOWN = 1200;
 
 // Open modal: position characters and start dancing
 openBtn.addEventListener('click', () => {
@@ -167,8 +167,10 @@ yesChar.addEventListener('click', () => {
 // No character click (evasive)
 noChar.addEventListener('click', (e) => {
   e.preventDefault(); e.stopPropagation();
+  e.stopImmediatePropagation();
   playBlip();
   spawnHearts(modalContent, 6);
+  lastEvadeTime = Date.now();
   spawnEvadeNo(Math.random()*Math.PI*2);
 });
 
@@ -211,8 +213,8 @@ modalContent.addEventListener('mousemove', (e) => {
 function spawnEvadeNo(angle){
   const danceActions = modal.querySelector('.dance-actions');
   const bounds = danceActions.getBoundingClientRect();
-  const padding = 20;
-  const radius = Math.min(bounds.width, bounds.height) * 0.35;
+  const padding = 25;
+  const radius = Math.min(bounds.width, bounds.height) * 0.40;
   const cx = bounds.width / 2;
   const cy = bounds.height / 2;
   const tx = Math.max(padding, Math.min(bounds.width - 130, cx + Math.cos(angle) * radius - 55));
