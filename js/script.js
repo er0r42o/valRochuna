@@ -27,10 +27,19 @@ cards.forEach((card, i) => {
     inner.style.transform = isFlipped ? 'rotateY(180deg)' : '';
   });
 
-  // flip + hearts
+  // flip + hearts — flip and expand when flipped
+  // keeps breathing animation when not flipped
   card.addEventListener('click', (ev) => {
     const idx = Number(card.getAttribute('data-index')) || 0;
     card.classList.toggle('flipped');
+    // expand when flipped
+    if (card.classList.contains('flipped')) {
+      card.classList.add('expanded');
+      // bring into view a bit
+      card.scrollIntoView({behavior: 'smooth', block: 'center'});
+    } else {
+      card.classList.remove('expanded');
+    }
     spawnHearts(card, 8);
     playChime();
 
@@ -104,6 +113,11 @@ const noChar = document.getElementById('say-no');
 function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
 function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
 
+
+// Dancing characters
+function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
+function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
+
 // Open modal: reset positions, start dancing
 openBtn.addEventListener('click', () => {
   modal.setAttribute('aria-hidden', 'false');
@@ -122,6 +136,9 @@ openBtn.addEventListener('click', () => {
 closeBtn.addEventListener('click', () => { 
   modal.setAttribute('aria-hidden', 'true');
   stopDancing();
+});
+
+// Yes character click
 });
 
 // Yes character click
@@ -176,6 +193,10 @@ yesChar.addEventListener('click', () => {
   setTimeout(()=>{ yesChar.classList.remove('save'); }, 1600);
 });
 
+// No character click (evasive)
+noChar.addEventListener('click', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  playBlip();
 // No is intentionally unselectable; clicks cause it to dodge further
 noChar.addEventListener('click', (e) => {
   e.preventDefault(); e.stopPropagation();
@@ -185,6 +206,7 @@ noChar.addEventListener('click', (e) => {
   spawnEvadeNo(Math.random()*Math.PI*2);
 });
 
+// Monitor pointer near No character
 // Monitor pointer, move noChar away when cursor approaches, move yesChar to shield position
 modalContent.addEventListener('mousemove', (e) => {
   const pointer = { x: e.clientX, y: e.clientY };
@@ -219,6 +241,14 @@ function spawnEvadeNo(angle){
   const tx = Math.max(padding, Math.min(bounds.width - 100, (cx + Math.cos(angle) * radius) - bounds.left));
   const ty = Math.max(padding, Math.min(bounds.height - 68, (cy + Math.sin(angle) * radius) - bounds.top));
   animateCharTo(noChar, Math.round(tx), Math.round(ty));
+}
+
+function animateCharTo(el, left, top){
+  el.style.position = 'absolute';
+  el.style.left = left + 'px';
+  el.style.top = top + 'px';
+  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
+}
 }
 
 function animateCharTo(el, left, top){
@@ -267,13 +297,83 @@ function showMemeOverlay(){
 
 // Simple WebAudio helpers for SFX
 let audioCtx, globalGain;
-function ensureAudio() { if(!audioCtx){ audioCtx = new (window.AudioContext||window.webkitAudioContext)(); globalGain = audioCtx.createGain(); globalGain.gain.value = 0.06; globalGain.connect(audioCtx.destination); }}
-function playBlip(){ ensureAudio(); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.value = 880; o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.001, audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.09, audioCtx.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.22); o.start(); o.stop(audioCtx.currentTime+0.22); }
-function playChime(){ ensureAudio(); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='triangle'; o.frequency.value = 520; o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.001, audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime+0.01); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.6); o.start(); o.stop(audioCtx.currentTime+0.6); }
-function playTwinkle(){ ensureAudio(); const now = audioCtx.currentTime; for(let i=0;i<3;i++){ const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.value = 880 + i*120; o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now + i*0.08); g.gain.linearRampToValueAtTime(0.07, now + i*0.08 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.08 + 0.26); o.start(now + i*0.08); o.stop(now + i*0.08 + 0.28); }
+function ensureAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    globalGain = audioCtx.createGain();
+    // softer overall volume for subtle / cute sounds
+    globalGain.gain.value = 0.03;
+    globalGain.connect(audioCtx.destination);
+  }
 }
-function playSwoosh(){ ensureAudio(); const now = audioCtx.currentTime; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(1200, now); o.frequency.exponentialRampToValueAtTime(500, now + 0.22); o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.07, now + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.26); o.start(now); o.stop(now + 0.26); }
 
+function playBlip(){
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'triangle';
+  o.frequency.value = 880;
+  o.connect(g); g.connect(globalGain);
+  g.gain.setValueAtTime(0.0005, now);
+  g.gain.linearRampToValueAtTime(0.028, now + 0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+  o.start(now); o.stop(now + 0.12);
+}
+
+function playChime(){
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  // gentle two-note chime
+  const o1 = audioCtx.createOscillator(); const g1 = audioCtx.createGain();
+  const o2 = audioCtx.createOscillator(); const g2 = audioCtx.createGain();
+  o1.type = 'sine'; o1.frequency.value = 540; o1.connect(g1); g1.connect(globalGain);
+  o2.type = 'sine'; o2.frequency.value = 720; o2.connect(g2); g2.connect(globalGain);
+  g1.gain.setValueAtTime(0.0002, now); g2.gain.setValueAtTime(0.00015, now);
+  g1.gain.linearRampToValueAtTime(0.03, now + 0.02); g2.gain.linearRampToValueAtTime(0.02, now + 0.02);
+  g1.gain.exponentialRampToValueAtTime(0.0001, now + 0.6); g2.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+  o1.start(now); o2.start(now + 0.03);
+  o1.stop(now + 0.6); o2.stop(now + 0.64);
+}
+
+function playTwinkle(){
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  const freqs = [780, 920, 1020];
+  freqs.forEach((f,i)=>{
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = f; o.connect(g); g.connect(globalGain);
+    g.gain.setValueAtTime(0.0001, now + i*0.06);
+    g.gain.linearRampToValueAtTime(0.02, now + i*0.06 + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.06 + 0.24);
+    o.start(now + i*0.06); o.stop(now + i*0.06 + 0.28);
+  });
+}
+
+function playSwoosh(){
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+  o.type = 'triangle'; o.frequency.setValueAtTime(900, now); o.frequency.exponentialRampToValueAtTime(480, now + 0.18);
+  o.connect(g); g.connect(globalGain);
+  g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.02, now + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+  o.start(now); o.stop(now + 0.24);
+}
+
+// Gentle 'heroic' save — soft layered sine chord
+function playHeroic(){
+  ensureAudio();
+  const now = audioCtx.currentTime;
+  const freqs = [520, 660, 840];
+  freqs.forEach((f,i)=>{
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.setValueAtTime(f, now + i*0.03); o.connect(g); g.connect(globalGain);
+    g.gain.setValueAtTime(0.0001, now + i*0.03);
+    g.gain.linearRampToValueAtTime(0.04, now + i*0.03 + 0.03);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.03 + 0.36);
+    o.start(now + i*0.03); o.stop(now + i*0.03 + 0.4);
+  });
+}
 // Heroic 'save' SFX used by Yes when shielding/clicked
 function playHeroic(){ ensureAudio(); const now = audioCtx.currentTime; const freqs = [660,880,1050]; freqs.forEach((f,i)=>{ const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(f, now + i*0.04); o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now + i*0.04); g.gain.linearRampToValueAtTime(0.12, now + i*0.04 + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.04 + 0.26); o.start(now + i*0.04); o.stop(now + i*0.04 + 0.28); }); }
 // Accessibility: close modal with Escape

@@ -37,6 +37,19 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .proposal-text{color:#6b3b6b;margin:1rem 0 2.5rem 0;font-size:1.3rem;line-height:1.7;font-weight:600;background:linear-gradient(90deg,rgba(255,127,191,0.1),rgba(166,123,255,0.1));padding:1.5rem 2rem;border-radius:14px;border-left:5px solid var(--accent)}
 .modal-actions{display:flex;gap:1.2rem;justify-content:center;margin-top:1.5rem;position:relative;min-height:200px;align-items:center}
 
+/* Ensure characters remain visible when modal is open (override inline absolute placement) */
+.modal[aria-hidden="false"] .character{
+  position:relative !important;
+  left:auto !important;
+  top:auto !important;
+}
+
+/* subtle breathing for cards */
+@keyframes breatheCard{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+.card:not(.flipped):not(:hover){animation:breatheCard 4s ease-in-out infinite}
+.card.expanded{transform:scale(1.08);z-index:6;box-shadow:0 28px 60px rgba(0,0,0,0.12)}
+.card.expanded .card-inner{transition:transform 0.6s;transform:rotateY(180deg) scale(1.02)}
+
 /* Animated character buttons - now visible and properly positioned */
 .dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:3rem;padding:2rem 1rem;width:100%;perspective:1000px;min-height:200px}
 .character{width:110px;height:90px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s,box-shadow .28s;position:relative;box-shadow:0 8px 16px rgba(0,0,0,0.08);-webkit-user-select:none;user-select:none;z-index:10}
