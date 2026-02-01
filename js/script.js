@@ -270,7 +270,7 @@ function showCelebrationMeme(){
   const celebMeme = document.createElement('div');
   celebMeme.className = 'meme-overlay celebration-meme';
   celebMeme.style.animation = 'celebrate 0.6s cubic-bezier(.34,1.56,.64,1)';
-  celebMeme.innerHTML = `<div class='meme-card' style='animation: celebrate 0.6s cubic-bezier(.34,1.56,.64,1)'><img src='assets/meme1.svg' alt='celebration' onerror="this.closest('.celebration-meme').classList.add('no-img')"></div>`;
+  celebMeme.innerHTML = `<div class='meme-card' style='animation: celebrate 0.6s cubic-bezier(.34,1.56,.64,1)'><img src='assets/celebration.gif' alt='celebration' onerror="this.closest('.celebration-meme').classList.add('no-img')"></div>`;
   celebMeme.addEventListener('click', () => { 
     celebMeme.style.animation = 'celebrateOut 0.4s ease-out forwards';
     setTimeout(()=>celebMeme.remove(), 400); 
