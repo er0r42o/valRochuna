@@ -16,6 +16,8 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .propose-btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));border:none;color:white;padding:0.75rem 1.25rem;border-radius:999px;font-weight:700;cursor:pointer;font-size:1rem;box-shadow:0 8px 20px rgba(166,123,255,0.18);position:relative;overflow:hidden}
 .propose-btn:after{content:'♥';position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:1.05rem;opacity:0.9;animation:pulse 1.6s infinite}
 @keyframes pulse{0%{transform:translateY(-50%) scale(0.9);opacity:0.8}50%{transform:translateY(-50%) scale(1.08);opacity:1}100%{transform:translateY(-50%) scale(0.9);opacity:0.8}}
+
+/* Cards and flipping */
 .cards{display:flex;gap:1rem;justify-content:center;margin-top:2rem}
 .card{width:200px;height:140px;perspective:900px;cursor:pointer;transform:translateY(20px);opacity:0;transition:transform 0.6s cubic-bezier(.2,.9,.2,1),opacity .6s;border-radius:14px;transform-origin:center center}
 .card.enter{transform:translateY(0);opacity:1}
@@ -29,81 +31,87 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .card .heart-particle{position:absolute;width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,#ff9acb,#a67bff);pointer-events:none;transform:translate(-50%,-50%) scale(0.7);opacity:0.95;animation:heartUp 900ms cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes heartUp{0%{transform:translate(-50%,-50%) scale(0.6);opacity:1}60%{transform:translate(-50%,-160%) scale(1.05);opacity:0.95}100%{transform:translate(-50%,-260%) scale(0.9);opacity:0}}
 .card .heart-particle:before{content:'♥';display:block;font-size:12px;line-height:18px;text-align:center;color:white}
-.footer{text-align:center;color:var(--muted);margin-top:1.5rem}
-.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);opacity:0;pointer-events:none;transition:opacity .25s}
-.modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
-.modal-content{background:linear-gradient(180deg,#fff,#fff7fb);padding:3.5rem 3rem;border-radius:16px;width:95%;max-width:920px;text-align:center;position:relative;overflow:visible}
-.modal-content h2{color:var(--accent-2);margin:0 0 1rem 0;font-size:2.2rem;font-weight:800}
-.proposal-text{color:#6b3b6b;margin:1rem 0 2.5rem 0;font-size:1.3rem;line-height:1.7;font-weight:600;background:linear-gradient(90deg,rgba(255,127,191,0.1),rgba(166,123,255,0.1));padding:1.5rem 2rem;border-radius:14px;border-left:5px solid var(--accent)}
-.modal-actions{display:flex;gap:1.2rem;justify-content:center;margin-top:1.5rem;position:relative;min-height:200px;align-items:center}
 
-/* Characters will be positioned absolutely inside modal when opened to allow evasion animations */
-
-/* subtle breathing for cards */
-@keyframes breatheCard{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}
+/* Card breathing and expansion */
+@keyframes breatheCard{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
 .card:not(.flipped):not(:hover){animation:breatheCard 4.2s ease-in-out infinite}
 .card.expanded{transform:scale(1.08);z-index:6;box-shadow:0 28px 60px rgba(0,0,0,0.12);transform-origin:center center}
 .card.expanded .card-inner{transition:transform 0.5s cubic-bezier(.2,.9,.2,1);transform:rotateY(180deg) scale(1.03)}
 
-/* Animated character buttons - now visible and properly positioned */
-.dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:3rem;padding:2rem 1rem;width:100%;perspective:1000px;min-height:200px}
-.character{width:110px;height:90px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s,box-shadow .28s;position:relative;box-shadow:0 8px 16px rgba(0,0,0,0.08);-webkit-user-select:none;user-select:none;z-index:10}
+.footer{text-align:center;color:var(--muted);margin-top:1.5rem}
+
+/* Modal */
+.modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);opacity:0;pointer-events:none;transition:opacity .25s;z-index:100}
+.modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
+.modal-content{background:linear-gradient(180deg,#fff,#fff7fb);padding:3.5rem 3rem;border-radius:16px;width:95%;max-width:920px;text-align:center;position:relative;overflow:visible;box-shadow:0 20px 60px rgba(0,0,0,0.15)}
+.modal-content h2{color:var(--accent-2);margin:0 0 1rem 0;font-size:2.2rem;font-weight:800}
+.modal .close{position:absolute;right:14px;top:14px;background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--muted);padding:0;width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.modal .close:hover{color:var(--accent-2)}
+
+/* Proposal text */
+.proposal-text{color:#6b3b6b;margin:1rem 0 2.5rem 0;font-size:1.3rem;line-height:1.7;font-weight:600;background:linear-gradient(90deg,rgba(255,127,191,0.1),rgba(166,123,255,0.1));padding:1.5rem 2rem;border-radius:14px;border-left:5px solid var(--accent)}
+
+/* Modal actions and characters */
+.modal-actions{display:flex;gap:2rem;justify-content:center;align-items:center;margin-top:2rem;position:relative;min-height:240px}
+.dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:2rem;padding:1.5rem 1rem;width:100%;perspective:1000px;min-height:240px}
+
+.character{width:110px;height:90px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s,box-shadow .28s;position:relative;box-shadow:0 8px 20px rgba(0,0,0,0.08);user-select:none;z-index:10}
 .char-img{width:50px;height:50px;display:block;border-radius:6px;flex-shrink:0}
-.character .label{font-weight:700;font-size:0.85rem;color:var(--muted);margin-top:4px;white-space:nowrap}
+.character .label{font-weight:700;font-size:0.85rem;color:var(--muted);margin-top:6px;white-space:nowrap}
+
 .yes-char{background:linear-gradient(135deg,#ff7fbf,#a67bff);color:white;box-shadow:0 10px 24px rgba(166,123,255,0.18)}
 .yes-char .label{color:#fff}
 .no-char{background:#fff;color:#5a4b63;border:2px solid #f0e8ff}
-.modal-content{background:linear-gradient(180deg,#fff,#fff7fb);padding:2.25rem;border-radius:16px;width:92%;max-width:920px;text-align:center;position:relative;overflow:visible}
-.modal-content h2{color:var(--accent-2);margin-top:0}
-.modal .close{position:absolute;right:14px;top:10px;background:none;border:none;font-size:1.2rem;cursor:pointer}
-.modal-actions{display:flex;gap:1rem;justify-content:center;margin-top:1rem;position:relative;min-height:220px}
 
-/* Animated character buttons */
-.dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:1rem;padding:0 1rem}
-.character{width:120px;height:64px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s;position:relative;box-shadow:0 8px 20px rgba(0,0,0,0.06);user-select:none}
-.char-img{width:44px;height:44px;display:block;border-radius:8px}
-.character .label{font-weight:800;font-size:0.95rem;color:var(--muted);margin-top:6px}
-.yes-char{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
-.yes-char .label{color:#fff}
-.no-char{background:#fff;color:#5a4b63}
+/* Character animations */
+@keyframes dance{0%{transform:translateY(0) rotate(0)}40%{transform:translateY(-6px) rotate(-4deg)}80%{transform:translateY(-3px) rotate(3deg)}100%{transform:translateY(0) rotate(0)}}
+.character.dance{animation:dance 900ms ease-in-out infinite}
 
-/* Save animation for Yes (jump + spin) */
-.character.save{animation:saveAnim 780ms cubic-bezier(.2,.9,.2,1) forwards}
 @keyframes saveAnim{
   0%{transform:translateY(0) rotate(0) scale(1)}
   25%{transform:translateY(-18px) rotate(18deg) scale(1.08)}
   60%{transform:translateY(-10px) rotate(270deg) scale(1.02)}
   100%{transform:translateY(0) rotate(360deg) scale(1)}
 }
-@keyframes dance{0%{transform:translateY(0) rotate(0)}40%{transform:translateY(-6px) rotate(-4deg)}80%{transform:translateY(-3px) rotate(3deg)}100%{transform:translateY(0) rotate(0)}}
-.character.dance{animation:dance 900ms ease-in-out infinite}
+.character.save{animation:saveAnim 780ms cubic-bezier(.2,.9,.2,1) forwards}
+
 .character.shield{transform:translateY(-8px) scale(1.06);z-index:6;box-shadow:0 18px 36px rgba(166,123,255,0.18)}
 .character.blocker{z-index:5}
 .no-char.evade{transform:translateY(-6px) rotate(-8deg)}
+
+/* Hero and floaters */
 .floaters{position:absolute;inset:0;pointer-events:none}
 .floaters:before{content:'';position:absolute;left:-10%;top:10%;width:220px;height:220px;background:radial-gradient(circle at 30% 30%, rgba(255,127,191,0.25), transparent 40%);border-radius:50%;filter:blur(20px)}
-.media-legacy-placeholder{}
-.media-legacy-placeholder{}
-@media (max-width:640px){.cards{flex-direction:column;align-items:center}.title{font-size:2.25rem}}
-/* Responsive tweaks for modal, characters and cards */
+
+.hero-photo{position:absolute;right:24px;top:24px;width:96px;height:96px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,0.8);box-shadow:0 12px 28px rgba(166,123,255,0.14);background:#ffeef8}
+.hero-photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;filter:contrast(1.02) saturate(1.05)}
+
+/* Confetti */
+.confetti-canvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
+
+/* Meme overlay */
+.meme-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:200;opacity:1;transition:opacity .3s}
+.meme-overlay .meme-card{background:linear-gradient(180deg,#fff,#fff7fb);padding:1rem;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.18)}
+.meme-overlay img{max-width:min(68vw,620px);max-height:72vh;border-radius:8px;display:block}
+.meme-overlay.no-img .meme-card{font-size:72px;padding:1.8rem}
+
+/* Responsive design */
 @media (max-width:900px){
   .modal-content{padding:2rem 1.25rem;width:94%;max-width:720px}
   .modal-actions{min-height:200px}
+  .dance-actions{min-height:200px}
 }
+
 @media (max-width:640px){
-  .cards{flex-direction:column;align-items:center}
+  body{padding:1.5rem}
+  .hero{padding:2rem}
   .title{font-size:2.25rem}
+  .cards{flex-direction:column;align-items:center}
   .card{width:86%;max-width:320px;height:150px}
   .card:not(.flipped):not(:hover){animation:breatheCard 5.5s ease-in-out infinite}
   .character{width:86px;height:56px}
   .char-img{width:36px;height:36px}
   .modal-content{padding:1.25rem;max-width:92%;width:92%}
   .modal-actions{min-height:180px}
+  .dance-actions{min-height:180px;gap:1rem}
 }
-.confetti-canvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
-.hero-photo{position:absolute;right:24px;top:24px;width:96px;height:96px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,0.8);box-shadow:0 12px 28px rgba(166,123,255,0.14);background:#ffeef8}
-.hero-photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%;filter:contrast(1.02) saturate(1.05)}
-.meme-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:200;opacity:1;transition:opacity .3s}
-.meme-overlay .meme-card{background:linear-gradient(180deg,#fff,#fff7fb);padding:1rem;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.18)}
-.meme-overlay img{max-width:min(68vw,620px);max-height:72vh;border-radius:8px;display:block}
-.meme-overlay.no-img .meme-card{font-size:72px;padding:1.8rem}
