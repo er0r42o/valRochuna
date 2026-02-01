@@ -178,6 +178,9 @@ noChar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.
 
 // Monitor pointer, move noChar away when cursor approaches, move yesChar to shield position
 modalContent.addEventListener('mousemove', (e) => {
+  // disable evasion while dancing (during initial animation)
+  if (!yesChar.classList.contains('dance')) return;
+  
   const pointer = { x: e.clientX, y: e.clientY };
   const nRect = noChar.getBoundingClientRect();
   const nCenter = { x: nRect.left + nRect.width/2, y: nRect.top + nRect.height/2 };
@@ -192,14 +195,16 @@ modalContent.addEventListener('mousemove', (e) => {
     lastEvadeTime = now;
 
     // yesChar shields: move between pointer and noChar
-    const modalBounds = modalContent.getBoundingClientRect();
-    const shieldX = Math.round((pointer.x + nCenter.x)/2 - modalBounds.left - 60);
-    const shieldY = Math.round(modalBounds.height - 72);
+    const danceActions = modal.querySelector('.dance-actions');
+    const daBounds = danceActions.getBoundingClientRect();
+    const nBounds = noChar.getBoundingClientRect();
+    const shieldX = Math.round((pointer.x + nBounds.left + nBounds.width/2)/2 - daBounds.left - 60);
+    const shieldY = Math.round(daBounds.height - 72);
     animateCharTo(yesChar, shieldX, shieldY);
-    yesChar.classList.add('shield','save');
+    yesChar.classList.add('shield');
+    yesChar.style.zIndex = '15';
     playHeroic();
-    setTimeout(()=>{ yesChar.classList.remove('shield'); }, 700);
-    setTimeout(()=>{ yesChar.classList.remove('save'); }, 1000);
+    setTimeout(()=>{ yesChar.classList.remove('shield'); yesChar.style.zIndex = '10'; }, 700);
   }
 });
 
@@ -213,14 +218,14 @@ function spawnEvadeNo(angle){
 }
 
 function animateCharTo(el, left, top){
-  // left/top are modal-content-relative coordinates
+  // left/top are dance-actions-relative coordinates
   el.style.position = 'absolute';
   el.style.left = left + 'px';
   el.style.top = top + 'px';
   el.style.visibility = 'visible';
   el.style.opacity = '1';
   el.style.display = 'flex';
-  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
+  el.style.transition = 'left 600ms cubic-bezier(.16,.86,.24,1), top 600ms cubic-bezier(.16,.86,.24,1), transform 280ms';
 }
 
 
