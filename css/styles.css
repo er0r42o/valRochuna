@@ -95,6 +95,11 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .meme-overlay img{max-width:min(68vw,620px);max-height:72vh;border-radius:8px;display:block}
 .meme-overlay.no-img .meme-card{font-size:72px;padding:1.8rem}
 
+/* Celebration animations */
+@keyframes celebrate{0%{transform:scale(0) rotate(-30deg);opacity:0}50%{transform:scale(1.1) rotate(5deg)}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes celebrateOut{0%{transform:scale(1) rotate(0);opacity:1}100%{transform:scale(0.9) rotate(15deg);opacity:0}}
+.celebration-meme .meme-card{animation:celebrate 0.6s cubic-bezier(.34,1.56,.64,1)}
+
 /* Responsive design */
 @media (max-width:900px){
   .modal-content{padding:2rem 1.25rem;width:94%;max-width:720px}

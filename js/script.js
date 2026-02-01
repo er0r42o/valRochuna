@@ -156,12 +156,16 @@ document.addEventListener('click', (e) => {
 // Yes character click
 yesChar.addEventListener('click', () => {
   document.querySelector('.proposal-text').textContent = `Yes! 💖`;
-  stopConfettiAfter(5000);
+  stopConfettiAfter(8000);
   playTwinkle();
   yesChar.classList.add('shield','save');
   playHeroic();
   setTimeout(()=>{ yesChar.classList.remove('shield'); }, 1400);
   setTimeout(()=>{ yesChar.classList.remove('save'); }, 1600);
+  // Show celebration meme
+  setTimeout(() => {
+    showCelebrationMeme();
+  }, 500);
 });
 
 // No character click (evasive)
@@ -257,6 +261,27 @@ function showMemeOverlay(){
     memeOverlay.addEventListener('click', () => { memeOverlay.style.opacity = 0; setTimeout(()=>memeOverlay.remove(),300); memeOverlay = null; playTwinkle(); });
     document.body.appendChild(memeOverlay);
   }
+}
+
+// Celebration meme overlay: celebratory style with animations
+function showCelebrationMeme(){
+  const celebMeme = document.createElement('div');
+  celebMeme.className = 'meme-overlay celebration-meme';
+  celebMeme.style.animation = 'celebrate 0.6s cubic-bezier(.34,1.56,.64,1)';
+  celebMeme.innerHTML = `<div class='meme-card' style='animation: celebrate 0.6s cubic-bezier(.34,1.56,.64,1)'><img src='assets/meme1.svg' alt='celebration' onerror="this.closest('.celebration-meme').classList.add('no-img')"></div>`;
+  celebMeme.addEventListener('click', () => { 
+    celebMeme.style.animation = 'celebrateOut 0.4s ease-out forwards';
+    setTimeout(()=>celebMeme.remove(), 400); 
+    playTwinkle(); 
+  });
+  document.body.appendChild(celebMeme);
+  // Auto-close after 5 seconds
+  setTimeout(() => { 
+    if (celebMeme.parentElement) {
+      celebMeme.style.animation = 'celebrateOut 0.4s ease-out forwards';
+      setTimeout(()=>celebMeme.remove(), 400);
+    }
+  }, 5000);
 }
 
 // Simple WebAudio helpers for SFX
