@@ -106,12 +106,14 @@ openBtn.addEventListener('click', () => {
   modal.setAttribute('aria-hidden', 'false');
   playChime();
   launchConfetti();
-  // position the characters inside modal
-  const b = modalContent.getBoundingClientRect();
-  const centerX = Math.round(b.width/2 - 60);
-  const bottomY = Math.round(b.height - 72);
-  animateCharTo(yesChar, centerX - 90, bottomY);
-  animateCharTo(noChar, centerX + 30, bottomY);
+  // Wait for modal to render before positioning characters
+  setTimeout(() => {
+    const b = modalContent.getBoundingClientRect();
+    const centerX = Math.round(b.width/2 - 60);
+    const bottomY = Math.round(b.height - 72);
+    animateCharTo(yesChar, centerX - 90, bottomY);
+    animateCharTo(noChar, centerX + 30, bottomY);
+  }, 50);
   startDancing();
 });
 
@@ -187,6 +189,9 @@ function animateCharTo(el, left, top){
   el.style.position = 'absolute';
   el.style.left = left + 'px';
   el.style.top = top + 'px';
+  el.style.visibility = 'visible';
+  el.style.opacity = '1';
+  el.style.display = 'flex';
   el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
 }
 
