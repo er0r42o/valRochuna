@@ -11,7 +11,7 @@
   <main class="page">
     <header class="hero">
       <div class="floaters" aria-hidden="true"></div>
-      <div class="hero-photo" aria-hidden="true"><img src="assets/photo.svg" alt="Ruchona Aziz"></div>
+      <div class="hero-photo" aria-hidden="true"><img src="assets/photo.jpg" alt="Ruchona Aziz"></div>
       <h1 class="title">For <span id="name-to">Ruchona&nbsp;Aziz</span></h1>
       <p class="subtitle">A small, silly, very sincere valentine from <strong id="name-from">Fahim</strong></p>
       <button class="propose-btn" id="open-proposal">Open Your Surprise 💌</button>
@@ -44,17 +44,34 @@
 
     <!-- Modal / Proposal -->
     <div class="modal" id="proposal-modal" aria-hidden="true">
-      <div class="modal-content">
+      <div class="modal-content" style="width:95%;max-width:920px;padding:3.5rem 3rem;">
         <button class="close" id="close-modal">✕</button>
         <h2>Ruchona</h2>
         <p class="proposal-text">Will you be my Valentine?</p>
         <div class="modal-actions dance-actions" aria-hidden="false">
           <div id="say-yes" class="character yes-char" role="button" tabindex="0" aria-label="Yes">
+            <svg class="char-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+              <defs><linearGradient id="gY" x1="0" x2="1" y1="0" y2="1"><stop offset="0%" stop-color="#ff90c1"/><stop offset="100%" stop-color="#a67bff"/></linearGradient></defs>
+              <rect width="120" height="120" rx="12" fill="url(#gY)"/>
+              <circle cx="60" cy="40" r="16" fill="#fff"/>
+              <circle cx="54" cy="36" r="2.5" fill="#333"/>
+              <circle cx="66" cy="36" r="2.5" fill="#333"/>
+              <path d="M 50 48 Q 60 55 70 48" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <text x="100" y="30" font-size="18">💖</text>
+            </svg>
             <img class="char-img" src="assets/yes.svg" alt="Yes character">
             <div class="label">Yes</div>
           </div>
 
           <div id="say-no" class="character no-char" role="button" tabindex="0" aria-label="No">
+            <svg class="char-img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+              <rect width="120" height="120" rx="12" fill="#fff9f8" stroke="#ffd1e8" stroke-width="2"/>
+              <circle cx="60" cy="40" r="16" fill="#ffeef8"/>
+              <circle cx="54" cy="36" r="2.5" fill="#333"/>
+              <circle cx="66" cy="36" r="2.5" fill="#333"/>
+              <path d="M 50 52 Q 60 46 70 52" stroke="#a67bff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <text x="95" y="30" font-size="16">✨</text>
+            </svg>
             <img class="char-img" src="assets/no.svg" alt="No character">
             <div class="label">No</div>
           </div>
