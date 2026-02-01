@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450">
+  <rect width="100%" height="100%" fill="#fff7fb"/>
+  <g transform="translate(40,40)">
+    <rect width="720" height="370" rx="12" fill="#fff" stroke="#f5e8ff" stroke-width="4"/>
+    <text x="360" y="160" font-family="Nunito, Arial" font-weight="800" font-size="44" text-anchor="middle" fill="#a056c6">You + Me</text>
+    <text x="360" y="220" font-family="Nunito, Arial" font-size="22" text-anchor="middle" fill="#6b3b6b">makes ordinary days extraordinary</text>
+  </g>
+</svg>
