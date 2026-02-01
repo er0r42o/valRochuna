@@ -12,24 +12,10 @@ cards.forEach((card, i) => {
 
   // tilt effect
   const inner = card.querySelector('.card-inner');
-  card.addEventListener('mousemove', (e) => {
-    const r = card.getBoundingClientRect();
-    const x = (e.clientX - r.left) / r.width - 0.5; // -0.5..0.5
-    const y = (e.clientY - r.top) / r.height - 0.5;
-    const rotateY = (x * 10).toFixed(2);
-    const rotateX = (-y * 6).toFixed(2);
-    const isFlipped = card.classList.contains('flipped');
-    inner.style.transform = `${isFlipped ? 'rotateY(180deg)' : ''} rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
-  });
-  card.addEventListener('mouseleave', () => {
-    // keep the flip state if flipped
-    const isFlipped = card.classList.contains('flipped');
-    inner.style.transform = isFlipped ? 'rotateY(180deg)' : '';
-  });
-
-  // flip + hearts — flip and expand when flipped
-  // keeps breathing animation when not flipped
+  
   card.addEventListener('click', (ev) => {
+    // Stop propagation so clicking a card doesn't trigger global unflip
+    ev.stopPropagation();
     const idx = Number(card.getAttribute('data-index')) || 0;
     card.classList.toggle('flipped');
     // expand when flipped
@@ -47,6 +33,21 @@ cards.forEach((card, i) => {
     if (idx === 3) { // third card: pop a silly meme overlay
       showMemeOverlay();
     }
+  });
+  
+  card.addEventListener('mousemove', (e) => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5; // -0.5..0.5
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    const rotateY = (x * 10).toFixed(2);
+    const rotateX = (-y * 6).toFixed(2);
+    const isFlipped = card.classList.contains('flipped');
+    inner.style.transform = `${isFlipped ? 'rotateY(180deg)' : ''} rotateY(${rotateY}deg) rotateX(${rotateX}deg)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    // keep the flip state if flipped
+    const isFlipped = card.classList.contains('flipped');
+    inner.style.transform = isFlipped ? 'rotateY(180deg)' : '';
   });
 });
 
@@ -103,12 +104,20 @@ const EVADE_COOLDOWN = 700;
 
 // Open modal: position characters and start dancing
 openBtn.addEventListener('click', () => {
+  // unflip all cards when opening modal
+  cards.forEach(card => {
+    card.classList.remove('flipped', 'expanded');
+    const inner = card.querySelector('.card-inner');
+    inner.style.transform = '';
+  });
+  
   modal.setAttribute('aria-hidden', 'false');
   playChime();
   launchConfetti();
   // Wait for modal to render before positioning characters
   setTimeout(() => {
-    const b = modalContent.getBoundingClientRect();
+    const danceActions = modal.querySelector('.dance-actions');
+    const b = danceActions.getBoundingClientRect();
     const centerX = Math.round(b.width/2 - 60);
     const bottomY = Math.round(b.height - 72);
     animateCharTo(yesChar, centerX - 90, bottomY);
@@ -123,6 +132,25 @@ closeBtn.addEventListener('click', () => {
   stopDancing();
   yesChar.style.left=''; yesChar.style.top='';
   noChar.style.left=''; noChar.style.top='';
+  // unflip any open cards
+  cards.forEach(card => {
+    card.classList.remove('flipped', 'expanded');
+    const inner = card.querySelector('.card-inner');
+    inner.style.transform = '';
+  });
+});
+
+// Global click handler to unflip cards when clicking outside
+document.addEventListener('click', (e) => {
+  // don't unflip if clicking on the modal or a card
+  if (modal.contains(e.target) || e.target.closest('.card')) return;
+  cards.forEach(card => {
+    if (card.classList.contains('flipped')) {
+      card.classList.remove('flipped', 'expanded');
+      const inner = card.querySelector('.card-inner');
+      inner.style.transform = '';
+    }
+  });
 });
 
 // Yes character click
@@ -196,9 +224,6 @@ function animateCharTo(el, left, top){
 }
 
 
-// When modal closes, stop dancing and reset positions
-closeBtn.addEventListener('click', ()=>{ stopDancing(); yesChar.style.left=''; yesChar.style.top=''; noChar.style.left=''; noChar.style.top=''; });
-
 // confetti canvas (kept from earlier implementation)
 const canvas = document.getElementById('confetti-canvas');
 const ctx = canvas.getContext('2d');
@@ -230,8 +255,8 @@ function ensureAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     globalGain = audioCtx.createGain();
-    // softer overall volume for subtle / cute sounds
-    globalGain.gain.value = 0.03;
+    // volume for cute sounds (audible but not too loud)
+    globalGain.gain.value = 0.08;
     globalGain.connect(audioCtx.destination);
   }
 }
