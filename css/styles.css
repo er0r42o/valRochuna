@@ -39,7 +39,7 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 
 /* Animated character buttons */
 .dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:1rem;padding:0 1rem}
-.character{width:120px;height:64px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s;position:relative;box-shadow:0 8px 20px rgba(0,0,0,0.06);user-select:none}
+.character{width:120px;height:64px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s;position:relative;box-shadow:0 8px 20px rgba(0,0,0,0.06);user-select:none;-webkit-user-select:none}
 .char-img{width:44px;height:44px;display:block;border-radius:8px}
 .character .label{font-weight:800;font-size:0.95rem;color:var(--muted);margin-top:6px}
 .yes-char{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
