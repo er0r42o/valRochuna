@@ -32,19 +32,19 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .footer{text-align:center;color:var(--muted);margin-top:1.5rem}
 .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.35);opacity:0;pointer-events:none;transition:opacity .25s}
 .modal[aria-hidden="false"]{opacity:1;pointer-events:auto}
-.modal-content{background:linear-gradient(180deg,#fff,#fff7fb);padding:2rem;border-radius:16px;width:90%;max-width:420px;text-align:center;position:relative;overflow:hidden}
-.modal-content h2{color:var(--accent-2);margin-top:0}
-.modal .close{position:absolute;right:14px;top:10px;background:none;border:none;font-size:1.2rem;cursor:pointer}
-.modal-actions{display:flex;gap:1rem;justify-content:center;margin-top:1rem;position:relative;height:86px}
+.modal-content{background:linear-gradient(180deg,#fff,#fff7fb);padding:2.5rem;border-radius:16px;width:90%;max-width:500px;text-align:center;position:relative;overflow:visible}
+.modal-content h2{color:var(--accent-2);margin:0 0 0.75rem 0;font-size:1.5rem}
+.proposal-text{color:#6b3b6b;margin:0.5rem 0 2rem 0;font-size:1.1rem;line-height:1.4}
+.modal-actions{display:flex;gap:1.2rem;justify-content:center;margin-top:1.5rem;position:relative;height:100px;align-items:flex-start}
 
-/* Animated character buttons */
-.dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:1rem;padding:0 1rem}
-.character{width:120px;height:64px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s;position:relative;box-shadow:0 8px 20px rgba(0,0,0,0.06);user-select:none;-webkit-user-select:none}
-.char-img{width:44px;height:44px;display:block;border-radius:8px}
-.character .label{font-weight:800;font-size:0.95rem;color:var(--muted);margin-top:6px}
-.yes-char{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
+/* Animated character buttons - now visible and properly positioned */
+.dance-actions{position:relative;display:flex;align-items:flex-start;justify-content:center;gap:1.2rem;padding:0 1rem;width:100%;perspective:1000px}
+.character{width:100px;height:80px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s,box-shadow .28s;position:relative;box-shadow:0 8px 16px rgba(0,0,0,0.08);-webkit-user-select:none;user-select:none;z-index:10}
+.char-img{width:40px;height:40px;display:block;border-radius:6px;flex-shrink:0}
+.character .label{font-weight:700;font-size:0.85rem;color:var(--muted);margin-top:4px;white-space:nowrap}
+.yes-char{background:linear-gradient(135deg,#ff7fbf,#a67bff);color:white;box-shadow:0 10px 24px rgba(166,123,255,0.18)}
 .yes-char .label{color:#fff}
-.no-char{background:#fff;color:#5a4b63}
+.no-char{background:#fff;color:#5a4b63;border:2px solid #f0e8ff}
 
 /* Save animation for Yes (jump + spin) */
 .character.save{animation:saveAnim 780ms cubic-bezier(.2,.9,.2,1) forwards}
@@ -63,8 +63,8 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .floaters:before{content:'';position:absolute;left:-10%;top:10%;width:220px;height:220px;background:radial-gradient(circle at 30% 30%, rgba(255,127,191,0.25), transparent 40%);border-radius:50%;filter:blur(20px)}
 @media (max-width:640px){.cards{flex-direction:column;align-items:center}.title{font-size:2.25rem}}
 .confetti-canvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none}
-.hero-photo{position:absolute;right:18px;top:18px;width:86px;height:86px;border-radius:999px;overflow:hidden;border:3px solid rgba(255,255,255,0.6);box-shadow:0 8px 20px rgba(166,123,255,0.08)}
-.hero-photo img{width:100%;height:100%;object-fit:cover;display:block}
+.hero-photo{position:absolute;right:24px;top:24px;width:96px;height:96px;border-radius:50%;overflow:hidden;border:3px solid rgba(255,255,255,0.8);box-shadow:0 12px 28px rgba(166,123,255,0.14);background:#ffeef8}
+.hero-photo img{width:100%;height:100%;object-fit:cover;display:block;border-radius:50%}
 .meme-overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:200;opacity:1;transition:opacity .3s}
 .meme-overlay .meme-card{background:linear-gradient(180deg,#fff,#fff7fb);padding:1rem;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,0.18)}
 .meme-overlay img{max-width:min(68vw,620px);max-height:72vh;border-radius:8px;display:block}
