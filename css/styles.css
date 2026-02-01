@@ -42,8 +42,13 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
   position:relative !important;
   left:auto !important;
   top:auto !important;
-  transform:none !important;
 }
+
+/* subtle breathing for cards */
+@keyframes breatheCard{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.02)}100%{transform:translateY(0) scale(1)}}
+.card:not(.flipped):not(:hover){animation:breatheCard 4s ease-in-out infinite}
+.card.expanded{transform:scale(1.08);z-index:6;box-shadow:0 28px 60px rgba(0,0,0,0.12)}
+.card.expanded .card-inner{transition:transform 0.6s;transform:rotateY(180deg) scale(1.02)}
 
 /* Animated character buttons - now visible and properly positioned */
 .dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:3rem;padding:2rem 1rem;width:100%;perspective:1000px;min-height:200px}
