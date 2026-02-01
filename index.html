@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>For Leila — A Little Valentine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="floaters" aria-hidden="true"></div>
+      <h1 class="title">For <span id="name-to">Leila</span></h1>
+      <p class="subtitle">A small, silly, very sincere valentine from <strong id="name-from">Fahim</strong></p>
+      <button class="propose-btn" id="open-proposal">Open Your Surprise 💌</button>
+      <div class="audio-controls">
+        <button id="toggle-music">Play music ♪</button>
+      </div>
+    </header>
+
+    <section class="cards">
+      <div class="card" data-index="1">
+        <div class="card-inner">
+          <div class="card-front">Why I like you</div>
+          <div class="card-back">Your laugh, your kindness, your eyes. And all your little quirks.</div>
+        </div>
+      </div>
+
+      <div class="card" data-index="2">
+        <div class="card-inner">
+          <div class="card-front">A favorite memory</div>
+          <div class="card-back">That afternoon walking in the park — warm cocoa, silly hats, and a perfect sky.</div>
+        </div>
+      </div>
+
+      <div class="card" data-index="3">
+        <div class="card-inner">
+          <div class="card-front">One tiny promise</div>
+          <div class="card-back">To make you smile as often as I can and to always try my best for you.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">Click any card to flip it. Tap the heart to reveal the big one.</footer>
+
+    <!-- Modal / Proposal -->
+    <div class="modal" id="proposal-modal" aria-hidden="true">
+      <div class="modal-content">
+        <button class="close" id="close-modal">✕</button>
+        <h2>Leila</h2>
+        <p class="proposal-text">Will you be my Valentine?</p>
+        <div class="modal-actions">
+          <button id="say-yes" class="yes">Yes 💖</button>
+          <button id="say-no" class="no">Maybe later 😊</button>
+        </div>
+      </div>
+    </div>
+
+    <canvas id="confetti-canvas" class="confetti-canvas" aria-hidden="true"></canvas>
+  </main>
+
+  <script src="js/script.js" defer></script>
+</body>
+</html>
