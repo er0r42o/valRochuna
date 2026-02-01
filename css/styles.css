@@ -35,10 +35,20 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .modal-content{background:linear-gradient(180deg,#fff,#fff7fb);padding:2rem;border-radius:16px;width:90%;max-width:420px;text-align:center;position:relative;overflow:hidden}
 .modal-content h2{color:var(--accent-2);margin-top:0}
 .modal .close{position:absolute;right:14px;top:10px;background:none;border:none;font-size:1.2rem;cursor:pointer}
-.modal-actions{display:flex;gap:1rem;justify-content:center;margin-top:1rem;position:relative;height:56px}
-.yes{background:linear-gradient(90deg,var(--accent),#ff94c7);border:none;padding:0.6rem 1rem;border-radius:10px;color:white;font-weight:700}
-.no{background:#eee;border:none;padding:0.6rem 1rem;border-radius:10px;position:absolute;right:calc(50% - 40px);top:8px;cursor:pointer;transition:left .36s cubic-bezier(.16,.86,.24,1), top .36s cubic-bezier(.16,.86,.24,1), transform .22s;will-change:left,top,transform;box-shadow:0 8px 18px rgba(0,0,0,0.06)}
-.no.evade{transform:translateY(-6px) rotate(-6deg)}
+.modal-actions{display:flex;gap:1rem;justify-content:center;margin-top:1rem;position:relative;height:86px}
+
+/* Animated character buttons */
+.dance-actions{position:relative;display:flex;align-items:center;justify-content:center;gap:1rem;padding:0 1rem}
+.character{width:120px;height:64px;border-radius:12px;background:linear-gradient(180deg,#ffffff,#fff7fb);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .28s,left .36s,top .36s;position:relative;box-shadow:0 8px 20px rgba(0,0,0,0.06);user-select:none}
+.character .emoji{font-size:1.35rem}
+.character .label{font-weight:800;font-size:0.95rem;color:var(--muted);margin-top:6px}
+.yes-char{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white}
+.no-char{background:#fff;color:#5a4b63}
+@keyframes dance{0%{transform:translateY(0) rotate(0)}40%{transform:translateY(-6px) rotate(-4deg)}80%{transform:translateY(-3px) rotate(3deg)}100%{transform:translateY(0) rotate(0)}}
+.character.dance{animation:dance 900ms ease-in-out infinite}
+.character.shield{transform:translateY(-8px) scale(1.06);z-index:6;box-shadow:0 18px 36px rgba(166,123,255,0.18)}
+.character.blocker{z-index:5}
+.no-char.evade{transform:translateY(-6px) rotate(-8deg)}
 .floaters{position:absolute;inset:0;pointer-events:none}
 .floaters:before{content:'';position:absolute;left:-10%;top:10%;width:220px;height:220px;background:radial-gradient(circle at 30% 30%, rgba(255,127,191,0.25), transparent 40%);border-radius:50%;filter:blur(20px)}
 @media (max-width:640px){.cards{flex-direction:column;align-items:center}.title{font-size:2.25rem}}

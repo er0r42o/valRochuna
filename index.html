@@ -48,9 +48,16 @@
         <button class="close" id="close-modal">✕</button>
         <h2>Ruchona</h2>
         <p class="proposal-text">Will you be my Valentine?</p>
-        <div class="modal-actions">
-          <button id="say-yes" class="yes">Yes 💖</button>
-          <button id="say-no" class="no">Maybe later 😊</button>
+        <div class="modal-actions dance-actions" aria-hidden="false">
+          <div id="say-yes" class="character yes-char" role="button" tabindex="0" aria-label="Yes">
+            <span class="emoji">💖</span>
+            <div class="label">Yes</div>
+          </div>
+
+          <div id="say-no" class="character no-char" role="button" tabindex="0" aria-label="No">
+            <span class="emoji">😅</span>
+            <div class="label">No</div>
+          </div>
         </div>
       </div>
     </div>
