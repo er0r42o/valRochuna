@@ -166,6 +166,9 @@ noChar.addEventListener('click', (e) => {
 // Dancing characters: yesChar and noChar (yes shields, no evades unselectable)
 const yesChar = document.getElementById('say-yes');
 const noChar = document.getElementById('say-no');
+// cooldown to avoid repeated evasion spam
+let lastEvadeTime = 0;
+const EVADE_COOLDOWN = 700; // ms
 // initial dance
 function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
 function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
@@ -216,29 +219,29 @@ modalContent.addEventListener('mousemove', (e) => {
   const nCenter = { x: nRect.left + nRect.width/2, y: nRect.top + nRect.height/2 };
   const dx = pointer.x - nCenter.x, dy = pointer.y - nCenter.y;
   const dist = Math.hypot(dx,dy);
-  const threshold = Math.max(110, nRect.width * 1.3);
-  if (dist < threshold) {
+  const threshold = Math.max(90, nRect.width * 1.1);
+  const now = Date.now();
+  if (dist < threshold && (now - lastEvadeTime) > EVADE_COOLDOWN) {
     const angle = Math.atan2(dy, dx);
-    spawnEvadeNo(angle + Math.PI* (0.6 + Math.random()*0.6));
+    spawnEvadeNo(angle + Math.PI * (0.6 + Math.random() * 0.6));
     playSwoosh();
-    // noChar evades
-    const angle = Math.atan2(dy, dx);
-    spawnEvadeNo(angle + Math.PI* (0.6 + Math.random()*0.6));
-    playSwoosh();
+    lastEvadeTime = now;
+
     // yesChar shields: move between pointer and noChar
-    const shieldX = Math.round((pointer.x + nCenter.x)/2 - modalContent.getBoundingClientRect().left - 60);
-    const shieldY = Math.round(modalContent.getBoundingClientRect().height - 72);
+    const modalBounds = modalContent.getBoundingClientRect();
+    const shieldX = Math.round((pointer.x + nCenter.x)/2 - modalBounds.left - 60);
+    const shieldY = Math.round(modalBounds.height - 72);
     animateCharTo(yesChar, shieldX, shieldY);
     yesChar.classList.add('shield','save');
     playHeroic();
-    setTimeout(()=>{ yesChar.classList.remove('shield'); }, 680);
-    setTimeout(()=>{ yesChar.classList.remove('save'); }, 980);
+    setTimeout(()=>{ yesChar.classList.remove('shield'); }, 700);
+    setTimeout(()=>{ yesChar.classList.remove('save'); }, 1000);
   }
 });
 
 function spawnEvadeNo(angle){
   const bounds = modalContent.getBoundingClientRect();
-  const padding = 18; const radius = Math.min(bounds.width,bounds.height) * 0.38 + 60;
+  const padding = 18; const radius = Math.min(bounds.width,bounds.height) * 0.45 + 60;
   const cx = bounds.left + bounds.width/2; const cy = bounds.top + bounds.height/2;
   const tx = Math.max(padding, Math.min(bounds.width - 100, (cx + Math.cos(angle) * radius) - bounds.left));
   const ty = Math.max(padding, Math.min(bounds.height - 68, (cy + Math.sin(angle) * radius) - bounds.top));
