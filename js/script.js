@@ -143,9 +143,11 @@ yesChar.addEventListener('click', () => {
   document.querySelector('.proposal-text').textContent = `Yes! 💖`;
   stopConfettiAfter(5000);
   playTwinkle();
-  // victory dance
-  yesChar.classList.add('shield');
-  setTimeout(()=>{ yesChar.classList.remove('shield') }, 1400);
+  // victory save animation + heroic sound
+  yesChar.classList.add('shield','save');
+  playHeroic();
+  setTimeout(()=>{ yesChar.classList.remove('shield'); }, 1400);
+  setTimeout(()=>{ yesChar.classList.remove('save'); }, 1600);
 });
 
 // No is intentionally unselectable; clicks cause it to dodge further
@@ -174,8 +176,10 @@ modalContent.addEventListener('mousemove', (e) => {
     const shieldX = Math.round((pointer.x + nCenter.x)/2 - modalContent.getBoundingClientRect().left - 60);
     const shieldY = Math.round(modalContent.getBoundingClientRect().height - 72);
     animateCharTo(yesChar, shieldX, shieldY);
-    yesChar.classList.add('shield');
-    setTimeout(()=> yesChar.classList.remove('shield'), 680);
+    yesChar.classList.add('shield','save');
+    playHeroic();
+    setTimeout(()=>{ yesChar.classList.remove('shield'); }, 680);
+    setTimeout(()=>{ yesChar.classList.remove('save'); }, 980);
   }
 });
 
@@ -233,6 +237,8 @@ function playTwinkle(){ ensureAudio(); const now = audioCtx.currentTime; for(let
 }
 function playSwoosh(){ ensureAudio(); const now = audioCtx.currentTime; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(1200, now); o.frequency.exponentialRampToValueAtTime(500, now + 0.22); o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.07, now + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.26); o.start(now); o.stop(now + 0.26); }
 
+// Heroic 'save' SFX used by Yes when shielding/clicked
+function playHeroic(){ ensureAudio(); const now = audioCtx.currentTime; const freqs = [660,880,1050]; freqs.forEach((f,i)=>{ const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(f, now + i*0.04); o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now + i*0.04); g.gain.linearRampToValueAtTime(0.12, now + i*0.04 + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.04 + 0.26); o.start(now + i*0.04); o.stop(now + i*0.04 + 0.28); }); }
 // Accessibility: close modal with Escape
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ modal.setAttribute('aria-hidden','true'); }});
 
