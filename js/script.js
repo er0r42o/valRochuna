@@ -43,32 +43,11 @@ cards.forEach((card, i) => {
     spawnHearts(card, 8);
     playChime();
 
-    // special behaviors per card
-    if (idx === 2) { // second card: try to dodge you a bit when interacted
-      dodgeCard(card);
-    }
+    // all cards flip and breathe uniformly
     if (idx === 3) { // third card: pop a silly meme overlay
       showMemeOverlay();
     }
   });
-
-  // make one card try to dodge when the cursor gets close (distance-based)
-  if (card.getAttribute('data-index') === '2') {
-    let last = 0;
-    card.addEventListener('mousemove', (e) => {
-      const now = Date.now();
-      if (now - last < 420) return;
-      const r = card.getBoundingClientRect();
-      const cx = r.left + r.width/2, cy = r.top + r.height/2;
-      const dx = e.clientX - cx, dy = e.clientY - cy;
-      const d = Math.hypot(dx,dy);
-      if (d < Math.max(120, r.width * 0.9)){
-        evadingMoveCard(card);
-        playSwoosh();
-        last = now;
-      }
-    });
-  }
 });
 
 function spawnHearts(card, count = 6) {
@@ -114,7 +93,35 @@ const noChar = document.getElementById('say-no');
 
 
 
-// Yes character click
+// Dance helpers
+function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
+function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
+
+// cooldown to avoid repeated evasion spam
+let lastEvadeTime = 0;
+const EVADE_COOLDOWN = 700;
+
+// Open modal: position characters and start dancing
+openBtn.addEventListener('click', () => {
+  modal.setAttribute('aria-hidden', 'false');
+  playChime();
+  launchConfetti();
+  // position the characters inside modal
+  const b = modalContent.getBoundingClientRect();
+  const centerX = Math.round(b.width/2 - 60);
+  const bottomY = Math.round(b.height - 72);
+  animateCharTo(yesChar, centerX - 90, bottomY);
+  animateCharTo(noChar, centerX + 30, bottomY);
+  startDancing();
+});
+
+// Close modal
+closeBtn.addEventListener('click', () => {
+  modal.setAttribute('aria-hidden', 'true');
+  stopDancing();
+  yesChar.style.left=''; yesChar.style.top='';
+  noChar.style.left=''; noChar.style.top='';
+});
 
 // Yes character click
 yesChar.addEventListener('click', () => {
@@ -133,55 +140,12 @@ noChar.addEventListener('click', (e) => {
   playBlip();
   spawnHearts(modalContent, 6);
   spawnEvadeNo(Math.random()*Math.PI*2);
-});
-
-// Monitor pointer near No character
-// cooldown to avoid repeated evasion spam
-let lastEvadeTime = 0;
-const EVADE_COOLDOWN = 700; // ms
-// initial dance helpers
-function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
-function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
-
-// place characters inside modal actions when modal opens
-openBtn.addEventListener('click', () => {
-  modal.setAttribute('aria-hidden', 'false');
-  playChime();
-  launchConfetti();
-  // position the characters
-  const b = modalContent.getBoundingClientRect();
-  const centerX = Math.round(b.width/2 - 60);
-  animateCharTo(yesChar, centerX - 90, Math.round(b.height - 72));
-  animateCharTo(noChar, centerX + 30, Math.round(b.height - 72));
-  startDancing();
 });
 
 // Keyboard accessibility for characters
 yesChar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); yesChar.click(); }});
 noChar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); noChar.click(); }});
 
-// yes behavior (selecting Yes)
-yesChar.addEventListener('click', () => {
-  document.querySelector('.proposal-text').textContent = `Yes! 💖`;
-  stopConfettiAfter(5000);
-  playTwinkle();
-  // victory save animation + heroic sound
-  yesChar.classList.add('shield','save');
-  playHeroic();
-  setTimeout(()=>{ yesChar.classList.remove('shield'); }, 1400);
-  setTimeout(()=>{ yesChar.classList.remove('save'); }, 1600);
-});
-
-// No character click (evasive)
-noChar.addEventListener('click', (e) => {
-  e.preventDefault(); e.stopPropagation();
-  playBlip();
-  // dramatic dodge and brief pulse
-  spawnHearts(modalContent, 6);
-  spawnEvadeNo(Math.random()*Math.PI*2);
-});
-
-// Monitor pointer near No character
 // Monitor pointer, move noChar away when cursor approaches, move yesChar to shield position
 modalContent.addEventListener('mousemove', (e) => {
   const pointer = { x: e.clientX, y: e.clientY };
