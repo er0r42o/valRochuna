@@ -214,7 +214,7 @@ function spawnEvadeNo(angle){
   const danceActions = modal.querySelector('.dance-actions');
   const bounds = danceActions.getBoundingClientRect();
   const padding = 25;
-  const radius = Math.min(bounds.width, bounds.height) * 0.40;
+  const radius = Math.min(bounds.width, bounds.height) * 0.60;
   const cx = bounds.width / 2;
   const cy = bounds.height / 2;
   const tx = Math.max(padding, Math.min(bounds.width - 130, cx + Math.cos(angle) * radius - 55));
