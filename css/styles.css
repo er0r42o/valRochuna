@@ -37,7 +37,7 @@ body{background:linear-gradient(135deg,var(--bg1),var(--bg2));display:flex;align
 .modal .close{position:absolute;right:14px;top:10px;background:none;border:none;font-size:1.2rem;cursor:pointer}
 .modal-actions{display:flex;gap:1rem;justify-content:center;margin-top:1rem;position:relative;height:56px}
 .yes{background:linear-gradient(90deg,var(--accent),#ff94c7);border:none;padding:0.6rem 1rem;border-radius:10px;color:white;font-weight:700}
-.no{background:#eee;border:none;padding:0.6rem 1rem;border-radius:10px;position:absolute;right:calc(50% - 40px);top:8px;cursor:pointer;transition:transform .28s, left .28s, top .28s;}
+.no{background:#eee;border:none;padding:0.6rem 1rem;border-radius:10px;position:absolute;right:calc(50% - 40px);top:8px;cursor:pointer;transition:left .36s cubic-bezier(.16,.86,.24,1), top .36s cubic-bezier(.16,.86,.24,1), transform .22s;will-change:left,top,transform;box-shadow:0 8px 18px rgba(0,0,0,0.06)}
 .no.evade{transform:translateY(-6px) rotate(-6deg)}
 .floaters{position:absolute;inset:0;pointer-events:none}
 .floaters:before{content:'';position:absolute;left:-10%;top:10%;width:220px;height:220px;background:radial-gradient(circle at 30% 30%, rgba(255,127,191,0.25), transparent 40%);border-radius:50%;filter:blur(20px)}

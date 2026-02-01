@@ -43,13 +43,20 @@ cards.forEach((card, i) => {
     }
   });
 
-  // make one card try to dodge on hover (like maybe-later)
+  // make one card try to dodge when the cursor gets close (distance-based)
   if (card.getAttribute('data-index') === '2') {
-    card.addEventListener('mouseenter', () => {
-      const willEvade = Math.random() < 0.55;
-      if (willEvade) {
+    let last = 0;
+    card.addEventListener('mousemove', (e) => {
+      const now = Date.now();
+      if (now - last < 420) return;
+      const r = card.getBoundingClientRect();
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      const dx = e.clientX - cx, dy = e.clientY - cy;
+      const d = Math.hypot(dx,dy);
+      if (d < Math.max(120, r.width * 0.9)){
         evadingMoveCard(card);
-        playBlip();
+        playSwoosh();
+        last = now;
       }
     });
   }
@@ -99,6 +106,9 @@ openBtn.addEventListener('click', () => {
   modal.setAttribute('aria-hidden', 'false');
   playChime();
   launchConfetti();
+  // position the "No" button near the modal bottom center on open
+  const b = modalContent.getBoundingClientRect();
+  animateNoTo(Math.round(b.width/2 - (noBtn.offsetWidth||80)/2), Math.round(b.height - 66));
 });
 closeBtn.addEventListener('click', () => modal.setAttribute('aria-hidden', 'true'));
 
@@ -108,37 +118,57 @@ yesBtn.addEventListener('click', () => {
   playTwinkle();
 });
 
-noBtn.addEventListener('mouseenter', (e) => {
-  if (evadeCount >= maxEvades) return; // stop evading after being persistent
-  moveNoButtonRandom();
-  noBtn.classList.add('evade');
-  setTimeout(() => noBtn.classList.remove('evade'), 300);
-  playBlip();
-  evadeCount++;
-});
-
-noBtn.addEventListener('click', () => {
-  // playful response when caught
-  if (evadeCount >= maxEvades) {
-    noBtn.textContent = 'Okay, maybe later 😊';
-    spawnHearts(modalContent, 10);
-    playTwinkle();
-  } else {
-    // small blip
-    playBlip();
-    moveNoButtonRandom();
+// Improved evasive behavior: distance-aware dodge when cursor approaches
+modalContent.addEventListener('mousemove', (e) => {
+  if (evadeCount >= maxEvades) return;
+  const pointer = { x: e.clientX, y: e.clientY };
+  const rect = noBtn.getBoundingClientRect();
+  const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  const dx = pointer.x - center.x;
+  const dy = pointer.y - center.y;
+  const dist = Math.hypot(dx, dy);
+  const threshold = Math.max(100, rect.width * 1.8);
+  if (dist < threshold) {
+    // run opposite, with a slight randomness bias
+    const angle = Math.atan2(dy, dx);
+    const away = angle + Math.PI * (0.6 + Math.random() * 0.8);
+    spawnEvadeNo(away);
+    noBtn.classList.add('evade');
+    setTimeout(() => noBtn.classList.remove('evade'), 480);
+    playSwoosh();
+    evadeCount++;
   }
 });
 
-function moveNoButtonRandom() {
+noBtn.addEventListener('click', () => {
+  if (evadeCount >= maxEvades) {
+    noBtn.textContent = 'Okay, maybe later 😊';
+    spawnHearts(modalContent, 14);
+    playTwinkle();
+  } else {
+    playBlip();
+    spawnEvadeNo(Math.random() * Math.PI * 2);
+  }
+});
+
+function spawnEvadeNo(angle) {
   const bounds = modalContent.getBoundingClientRect();
-  // keep within - button size approx 80x36
-  const padding = 20;
-  const left = Math.max(padding, Math.random() * (bounds.width - 120));
-  const top = Math.max(10, Math.random() * (bounds.height - 60));
+  const padding = 18;
+  const radius = Math.min(bounds.width, bounds.height) * 0.38 + 60;
+  const cx = bounds.left + bounds.width / 2;
+  const cy = bounds.top + bounds.height / 2;
+  const targetX = Math.max(padding, Math.min(bounds.width - 100, (cx + Math.cos(angle) * radius) - bounds.left));
+  const targetY = Math.max(padding, Math.min(bounds.height - 46, (cy + Math.sin(angle) * radius) - bounds.top));
+  animateNoTo(Math.round(targetX), Math.round(targetY));
+}
+
+function animateNoTo(left, top) {
+  noBtn.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
   noBtn.style.left = `${left}px`;
   noBtn.style.top = `${top}px`;
-}
+  noBtn.style.transform = 'scale(1.06) rotate(-7deg)';
+  setTimeout(()=>{ noBtn.style.transform = ''; }, 420);
+} 
 
 // confetti canvas (kept from earlier implementation)
 const canvas = document.getElementById('confetti-canvas');
@@ -172,6 +202,7 @@ function playBlip(){ ensureAudio(); const o = audioCtx.createOscillator(); const
 function playChime(){ ensureAudio(); const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='triangle'; o.frequency.value = 520; o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.001, audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime+0.01); g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime+0.6); o.start(); o.stop(audioCtx.currentTime+0.6); }
 function playTwinkle(){ ensureAudio(); const now = audioCtx.currentTime; for(let i=0;i<3;i++){ const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.value = 880 + i*120; o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now + i*0.08); g.gain.linearRampToValueAtTime(0.07, now + i*0.08 + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.08 + 0.26); o.start(now + i*0.08); o.stop(now + i*0.08 + 0.28); }
 }
+function playSwoosh(){ ensureAudio(); const now = audioCtx.currentTime; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(1200, now); o.frequency.exponentialRampToValueAtTime(500, now + 0.22); o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now); g.gain.linearRampToValueAtTime(0.07, now + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, now + 0.26); o.start(now); o.stop(now + 0.26); }
 
 // Accessibility: close modal with Escape
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ modal.setAttribute('aria-hidden','true'); }});
