@@ -113,6 +113,11 @@ const noChar = document.getElementById('say-no');
 function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
 function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
 
+
+// Dancing characters
+function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
+function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
+
 // Open modal: reset positions, start dancing
 openBtn.addEventListener('click', () => {
   modal.setAttribute('aria-hidden', 'false');
@@ -131,6 +136,9 @@ openBtn.addEventListener('click', () => {
 closeBtn.addEventListener('click', () => { 
   modal.setAttribute('aria-hidden', 'true');
   stopDancing();
+});
+
+// Yes character click
 });
 
 // Yes character click
@@ -153,6 +161,53 @@ noChar.addEventListener('click', (e) => {
 });
 
 // Monitor pointer near No character
+// Dancing characters: yesChar and noChar (yes shields, no evades unselectable)
+const yesChar = document.getElementById('say-yes');
+const noChar = document.getElementById('say-no');
+// initial dance
+function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
+function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
+
+// place characters inside modal actions when modal opens
+openBtn.addEventListener('click', () => {
+  modal.setAttribute('aria-hidden', 'false');
+  playChime();
+  launchConfetti();
+  // position the characters
+  const b = modalContent.getBoundingClientRect();
+  const centerX = Math.round(b.width/2 - 60);
+  animateCharTo(yesChar, centerX - 90, Math.round(b.height - 72));
+  animateCharTo(noChar, centerX + 30, Math.round(b.height - 72));
+  startDancing();
+});
+
+// yes behavior (selecting Yes)
+yesChar.addEventListener('click', () => {
+  document.querySelector('.proposal-text').textContent = `Yes! 💖`;
+  stopConfettiAfter(5000);
+  playTwinkle();
+  // victory save animation + heroic sound
+  yesChar.classList.add('shield','save');
+  playHeroic();
+  setTimeout(()=>{ yesChar.classList.remove('shield'); }, 1400);
+  setTimeout(()=>{ yesChar.classList.remove('save'); }, 1600);
+});
+
+// No character click (evasive)
+noChar.addEventListener('click', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  playBlip();
+// No is intentionally unselectable; clicks cause it to dodge further
+noChar.addEventListener('click', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  playBlip();
+  // dramatic dodge and brief pulse
+  spawnHearts(modalContent, 6);
+  spawnEvadeNo(Math.random()*Math.PI*2);
+});
+
+// Monitor pointer near No character
+// Monitor pointer, move noChar away when cursor approaches, move yesChar to shield position
 modalContent.addEventListener('mousemove', (e) => {
   const pointer = { x: e.clientX, y: e.clientY };
   const nRect = noChar.getBoundingClientRect();
@@ -164,6 +219,14 @@ modalContent.addEventListener('mousemove', (e) => {
     const angle = Math.atan2(dy, dx);
     spawnEvadeNo(angle + Math.PI* (0.6 + Math.random()*0.6));
     playSwoosh();
+    // noChar evades
+    const angle = Math.atan2(dy, dx);
+    spawnEvadeNo(angle + Math.PI* (0.6 + Math.random()*0.6));
+    playSwoosh();
+    // yesChar shields: move between pointer and noChar
+    const shieldX = Math.round((pointer.x + nCenter.x)/2 - modalContent.getBoundingClientRect().left - 60);
+    const shieldY = Math.round(modalContent.getBoundingClientRect().height - 72);
+    animateCharTo(yesChar, shieldX, shieldY);
     yesChar.classList.add('shield','save');
     playHeroic();
     setTimeout(()=>{ yesChar.classList.remove('shield'); }, 680);
@@ -186,6 +249,26 @@ function animateCharTo(el, left, top){
   el.style.top = top + 'px';
   el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
 }
+}
+
+function animateCharTo(el, left, top){
+  el.style.position = 'absolute';
+  el.style.left = left + 'px';
+  el.style.top = top + 'px';
+  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
+}
+}
+
+function animateCharTo(el, left, top){
+  // left/top are modal-content-relative coordinates
+  el.style.position = 'absolute';
+  el.style.left = left + 'px';
+  el.style.top = top + 'px';
+  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
+}
+
+// When modal closes, stop dancing and reset positions
+closeBtn.addEventListener('click', ()=>{ stopDancing(); yesChar.style.left=''; yesChar.style.top=''; noChar.style.left=''; noChar.style.top=''; });
 
 // confetti canvas (kept from earlier implementation)
 const canvas = document.getElementById('confetti-canvas');
@@ -291,6 +374,8 @@ function playHeroic(){
     o.start(now + i*0.03); o.stop(now + i*0.03 + 0.4);
   });
 }
+// Heroic 'save' SFX used by Yes when shielding/clicked
+function playHeroic(){ ensureAudio(); const now = audioCtx.currentTime; const freqs = [660,880,1050]; freqs.forEach((f,i)=>{ const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(f, now + i*0.04); o.connect(g); g.connect(globalGain); g.gain.setValueAtTime(0.0001, now + i*0.04); g.gain.linearRampToValueAtTime(0.12, now + i*0.04 + 0.025); g.gain.exponentialRampToValueAtTime(0.0001, now + i*0.04 + 0.26); o.start(now + i*0.04); o.stop(now + i*0.04 + 0.28); }); }
 // Accessibility: close modal with Escape
 document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ modal.setAttribute('aria-hidden','true'); }});
 
