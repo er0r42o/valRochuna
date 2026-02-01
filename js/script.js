@@ -100,7 +100,7 @@ function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remo
 
 // cooldown to avoid repeated evasion spam
 let lastEvadeTime = 0;
-const EVADE_COOLDOWN = 1200;
+const EVADE_COOLDOWN = 600;
 
 // Open modal: position characters and start dancing
 openBtn.addEventListener('click', () => {
@@ -188,7 +188,7 @@ modalContent.addEventListener('mousemove', (e) => {
   const nCenter = { x: nRect.left + nRect.width/2, y: nRect.top + nRect.height/2 };
   const dx = pointer.x - nCenter.x, dy = pointer.y - nCenter.y;
   const dist = Math.hypot(dx,dy);
-  const threshold = Math.max(90, nRect.width * 1.1);
+  const threshold = Math.max(70, nRect.width * 0.9);
   const now = Date.now();
   if (dist < threshold && (now - lastEvadeTime) > EVADE_COOLDOWN) {
     const angle = Math.atan2(dy, dx);
