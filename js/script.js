@@ -12,6 +12,29 @@ cards.forEach((card, i) => {
 
   // tilt effect
   const inner = card.querySelector('.card-inner');
+  
+  card.addEventListener('click', (ev) => {
+    // Stop propagation so clicking a card doesn't trigger global unflip
+    ev.stopPropagation();
+    const idx = Number(card.getAttribute('data-index')) || 0;
+    card.classList.toggle('flipped');
+    // expand when flipped
+    if (card.classList.contains('flipped')) {
+      card.classList.add('expanded');
+      // bring into view a bit
+      card.scrollIntoView({behavior: 'smooth', block: 'center'});
+    } else {
+      card.classList.remove('expanded');
+    }
+    spawnHearts(card, 8);
+    playChime();
+
+    // all cards flip and breathe uniformly
+    if (idx === 3) { // third card: pop a silly meme overlay
+      showMemeOverlay();
+    }
+  });
+  
   card.addEventListener('mousemove', (e) => {
     const r = card.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width - 0.5; // -0.5..0.5
@@ -26,49 +49,6 @@ cards.forEach((card, i) => {
     const isFlipped = card.classList.contains('flipped');
     inner.style.transform = isFlipped ? 'rotateY(180deg)' : '';
   });
-
-  // flip + hearts — flip and expand when flipped
-  // keeps breathing animation when not flipped
-  card.addEventListener('click', (ev) => {
-    const idx = Number(card.getAttribute('data-index')) || 0;
-    card.classList.toggle('flipped');
-    // expand when flipped
-    if (card.classList.contains('flipped')) {
-      card.classList.add('expanded');
-      // bring into view a bit
-      card.scrollIntoView({behavior: 'smooth', block: 'center'});
-    } else {
-      card.classList.remove('expanded');
-    }
-    spawnHearts(card, 8);
-    playChime();
-
-    // special behaviors per card
-    if (idx === 2) { // second card: try to dodge you a bit when interacted
-      dodgeCard(card);
-    }
-    if (idx === 3) { // third card: pop a silly meme overlay
-      showMemeOverlay();
-    }
-  });
-
-  // make one card try to dodge when the cursor gets close (distance-based)
-  if (card.getAttribute('data-index') === '2') {
-    let last = 0;
-    card.addEventListener('mousemove', (e) => {
-      const now = Date.now();
-      if (now - last < 420) return;
-      const r = card.getBoundingClientRect();
-      const cx = r.left + r.width/2, cy = r.top + r.height/2;
-      const dx = e.clientX - cx, dy = e.clientY - cy;
-      const d = Math.hypot(dx,dy);
-      if (d < Math.max(120, r.width * 0.9)){
-        evadingMoveCard(card);
-        playSwoosh();
-        last = now;
-      }
-    });
-  }
 });
 
 function spawnHearts(card, count = 6) {
@@ -109,166 +89,156 @@ const closeBtn = document.getElementById('close-modal');
 const yesChar = document.getElementById('say-yes');
 const noChar = document.getElementById('say-no');
 
-// Dancing characters
+
+
+
+
+
+// Dance helpers
 function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
 function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
 
+// cooldown to avoid repeated evasion spam
+let lastEvadeTime = 0;
+const EVADE_COOLDOWN = 600;
 
-// Dancing characters
-function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
-function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
-
-// Open modal: reset positions, start dancing
+// Open modal: position characters and start dancing
 openBtn.addEventListener('click', () => {
+  // unflip all cards when opening modal
+  cards.forEach(card => {
+    card.classList.remove('flipped', 'expanded');
+    const inner = card.querySelector('.card-inner');
+    inner.style.transform = '';
+  });
+  
   modal.setAttribute('aria-hidden', 'false');
   playChime();
   launchConfetti();
-  // Reset to flex layout (characters visible at default positions)
-  yesChar.style.position = 'relative';
-  noChar.style.position = 'relative';
-  yesChar.style.left = 'auto';
-  yesChar.style.top = 'auto';
-  noChar.style.left = 'auto';
-  noChar.style.top = 'auto';
+  // Wait for modal to render before positioning characters
+  setTimeout(() => {
+    const danceActions = modal.querySelector('.dance-actions');
+    const b = danceActions.getBoundingClientRect();
+    const centerX = Math.round(b.width/2 - 60);
+    const bottomY = Math.round(b.height - 72);
+    animateCharTo(yesChar, centerX - 90, bottomY);
+    animateCharTo(noChar, centerX + 30, bottomY);
+  }, 50);
   startDancing();
 });
 
-closeBtn.addEventListener('click', () => { 
+// Close modal
+closeBtn.addEventListener('click', () => {
   modal.setAttribute('aria-hidden', 'true');
   stopDancing();
+  yesChar.style.left=''; yesChar.style.top='';
+  noChar.style.left=''; noChar.style.top='';
+  // unflip any open cards
+  cards.forEach(card => {
+    card.classList.remove('flipped', 'expanded');
+    const inner = card.querySelector('.card-inner');
+    inner.style.transform = '';
+  });
 });
 
-// Yes character click
+// Global click handler to unflip cards when clicking outside
+document.addEventListener('click', (e) => {
+  // don't unflip if clicking on the modal or a card
+  if (modal.contains(e.target) || e.target.closest('.card')) return;
+  cards.forEach(card => {
+    if (card.classList.contains('flipped')) {
+      card.classList.remove('flipped', 'expanded');
+      const inner = card.querySelector('.card-inner');
+      inner.style.transform = '';
+    }
+  });
 });
 
 // Yes character click
 yesChar.addEventListener('click', () => {
   document.querySelector('.proposal-text').textContent = `Yes! 💖`;
-  stopConfettiAfter(5000);
-  playTwinkle();
-  yesChar.classList.add('shield','save');
-  playHeroic();
-  setTimeout(()=>{ yesChar.classList.remove('shield'); }, 1400);
-  setTimeout(()=>{ yesChar.classList.remove('save'); }, 1600);
-});
-
-// No character click (evasive)
-noChar.addEventListener('click', (e) => {
-  e.preventDefault(); e.stopPropagation();
-  playBlip();
-  spawnHearts(modalContent, 6);
-  spawnEvadeNo(Math.random()*Math.PI*2);
-});
-
-// Monitor pointer near No character
-// Dancing characters: yesChar and noChar (yes shields, no evades unselectable)
-const yesChar = document.getElementById('say-yes');
-const noChar = document.getElementById('say-no');
-// initial dance
-function startDancing(){ yesChar.classList.add('dance'); noChar.classList.add('dance'); }
-function stopDancing(){ yesChar.classList.remove('dance'); noChar.classList.remove('dance'); }
-
-// place characters inside modal actions when modal opens
-openBtn.addEventListener('click', () => {
-  modal.setAttribute('aria-hidden', 'false');
-  playChime();
   launchConfetti();
-  // position the characters
-  const b = modalContent.getBoundingClientRect();
-  const centerX = Math.round(b.width/2 - 60);
-  animateCharTo(yesChar, centerX - 90, Math.round(b.height - 72));
-  animateCharTo(noChar, centerX + 30, Math.round(b.height - 72));
-  startDancing();
-});
-
-// yes behavior (selecting Yes)
-yesChar.addEventListener('click', () => {
-  document.querySelector('.proposal-text').textContent = `Yes! 💖`;
-  stopConfettiAfter(5000);
+  runConfetti();
+  stopConfettiAfter(8000);
   playTwinkle();
-  // victory save animation + heroic sound
   yesChar.classList.add('shield','save');
   playHeroic();
   setTimeout(()=>{ yesChar.classList.remove('shield'); }, 1400);
   setTimeout(()=>{ yesChar.classList.remove('save'); }, 1600);
+  // Show celebration meme
+  setTimeout(() => {
+    showCelebrationMeme();
+  }, 500);
 });
 
 // No character click (evasive)
 noChar.addEventListener('click', (e) => {
   e.preventDefault(); e.stopPropagation();
+  e.stopImmediatePropagation();
   playBlip();
-// No is intentionally unselectable; clicks cause it to dodge further
-noChar.addEventListener('click', (e) => {
-  e.preventDefault(); e.stopPropagation();
-  playBlip();
-  // dramatic dodge and brief pulse
   spawnHearts(modalContent, 6);
+  lastEvadeTime = Date.now();
   spawnEvadeNo(Math.random()*Math.PI*2);
 });
 
-// Monitor pointer near No character
+// Keyboard accessibility for characters
+yesChar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); yesChar.click(); }});
+noChar.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); noChar.click(); }});
+
 // Monitor pointer, move noChar away when cursor approaches, move yesChar to shield position
 modalContent.addEventListener('mousemove', (e) => {
+  // disable evasion while dancing (during initial animation)
+  if (!yesChar.classList.contains('dance')) return;
+  
   const pointer = { x: e.clientX, y: e.clientY };
   const nRect = noChar.getBoundingClientRect();
   const nCenter = { x: nRect.left + nRect.width/2, y: nRect.top + nRect.height/2 };
   const dx = pointer.x - nCenter.x, dy = pointer.y - nCenter.y;
   const dist = Math.hypot(dx,dy);
-  const threshold = Math.max(110, nRect.width * 1.3);
-  if (dist < threshold) {
+  const threshold = Math.max(70, nRect.width * 0.9);
+  const now = Date.now();
+  if (dist < threshold && (now - lastEvadeTime) > EVADE_COOLDOWN) {
     const angle = Math.atan2(dy, dx);
-    spawnEvadeNo(angle + Math.PI* (0.6 + Math.random()*0.6));
+    spawnEvadeNo(angle + Math.PI * (0.6 + Math.random() * 0.6));
     playSwoosh();
-    // noChar evades
-    const angle = Math.atan2(dy, dx);
-    spawnEvadeNo(angle + Math.PI* (0.6 + Math.random()*0.6));
-    playSwoosh();
+    lastEvadeTime = now;
+
     // yesChar shields: move between pointer and noChar
-    const shieldX = Math.round((pointer.x + nCenter.x)/2 - modalContent.getBoundingClientRect().left - 60);
-    const shieldY = Math.round(modalContent.getBoundingClientRect().height - 72);
+    const danceActions = modal.querySelector('.dance-actions');
+    const daBounds = danceActions.getBoundingClientRect();
+    const nBounds = noChar.getBoundingClientRect();
+    const shieldX = Math.round((pointer.x + nBounds.left + nBounds.width/2)/2 - daBounds.left - 60);
+    const shieldY = Math.round(daBounds.height - 72);
     animateCharTo(yesChar, shieldX, shieldY);
-    yesChar.classList.add('shield','save');
+    yesChar.classList.add('shield');
+    yesChar.style.zIndex = '15';
     playHeroic();
-    setTimeout(()=>{ yesChar.classList.remove('shield'); }, 680);
-    setTimeout(()=>{ yesChar.classList.remove('save'); }, 980);
+    setTimeout(()=>{ yesChar.classList.remove('shield'); yesChar.style.zIndex = '10'; }, 700);
   }
 });
 
 function spawnEvadeNo(angle){
-  const bounds = modalContent.getBoundingClientRect();
-  const padding = 18; const radius = Math.min(bounds.width,bounds.height) * 0.38 + 60;
-  const cx = bounds.left + bounds.width/2; const cy = bounds.top + bounds.height/2;
-  const tx = Math.max(padding, Math.min(bounds.width - 100, (cx + Math.cos(angle) * radius) - bounds.left));
-  const ty = Math.max(padding, Math.min(bounds.height - 68, (cy + Math.sin(angle) * radius) - bounds.top));
+  const danceActions = modal.querySelector('.dance-actions');
+  const bounds = danceActions.getBoundingClientRect();
+  const padding = 25;
+  const radius = Math.min(bounds.width, bounds.height) * 1.20;
+  const cx = bounds.width / 2;
+  const cy = bounds.height / 2;
+  const tx = Math.max(padding, Math.min(bounds.width - 130, cx + Math.cos(angle) * radius - 55));
+  const ty = Math.max(padding, Math.min(bounds.height - 100, cy + Math.sin(angle) * radius - 45));
   animateCharTo(noChar, Math.round(tx), Math.round(ty));
 }
 
 function animateCharTo(el, left, top){
+  // left/top are dance-actions-relative coordinates
   el.style.position = 'absolute';
   el.style.left = left + 'px';
   el.style.top = top + 'px';
-  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
-}
-}
-
-function animateCharTo(el, left, top){
-  el.style.position = 'absolute';
-  el.style.left = left + 'px';
-  el.style.top = top + 'px';
-  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
-}
+  el.style.visibility = 'visible';
+  el.style.opacity = '1';
+  el.style.display = 'flex';
+  el.style.transition = 'left 600ms cubic-bezier(.16,.86,.24,1), top 600ms cubic-bezier(.16,.86,.24,1), transform 280ms';
 }
 
-function animateCharTo(el, left, top){
-  // left/top are modal-content-relative coordinates
-  el.style.position = 'absolute';
-  el.style.left = left + 'px';
-  el.style.top = top + 'px';
-  el.style.transition = 'left 360ms cubic-bezier(.16,.86,.24,1), top 360ms cubic-bezier(.16,.86,.24,1), transform 220ms';
-}
-
-// When modal closes, stop dancing and reset positions
-closeBtn.addEventListener('click', ()=>{ stopDancing(); yesChar.style.left=''; yesChar.style.top=''; noChar.style.left=''; noChar.style.top=''; });
 
 // confetti canvas (kept from earlier implementation)
 const canvas = document.getElementById('confetti-canvas');
@@ -295,14 +265,35 @@ function showMemeOverlay(){
   }
 }
 
+// Celebration meme overlay: celebratory style with animations
+function showCelebrationMeme(){
+  const celebMeme = document.createElement('div');
+  celebMeme.className = 'meme-overlay celebration-meme';
+  celebMeme.style.animation = 'celebrate 0.6s cubic-bezier(.34,1.56,.64,1)';
+  celebMeme.innerHTML = `<div class='meme-card' style='animation: celebrate 0.6s cubic-bezier(.34,1.56,.64,1)'><img src='assets/celebration.gif' alt='celebration' onerror="this.closest('.celebration-meme').classList.add('no-img')"></div>`;
+  celebMeme.addEventListener('click', () => { 
+    celebMeme.style.animation = 'celebrateOut 0.4s ease-out forwards';
+    setTimeout(()=>celebMeme.remove(), 400); 
+    playTwinkle(); 
+  });
+  document.body.appendChild(celebMeme);
+  // Auto-close after 5 seconds
+  setTimeout(() => { 
+    if (celebMeme.parentElement) {
+      celebMeme.style.animation = 'celebrateOut 0.4s ease-out forwards';
+      setTimeout(()=>celebMeme.remove(), 400);
+    }
+  }, 5000);
+}
+
 // Simple WebAudio helpers for SFX
 let audioCtx, globalGain;
 function ensureAudio() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     globalGain = audioCtx.createGain();
-    // softer overall volume for subtle / cute sounds
-    globalGain.gain.value = 0.03;
+    // volume for cute sounds (audible but not too loud)
+    globalGain.gain.value = 0.08;
     globalGain.connect(audioCtx.destination);
   }
 }
